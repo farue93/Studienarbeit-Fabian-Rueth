@@ -43,8 +43,7 @@ OUTPUT.mkdir(parents=True, exist_ok=True)   # Ausgabeordner anlegen, falls nicht
 
 # ── Detektion (Steger) ────────────────────────────────────────────────────
 SIGMA_B            = 15.0              # px Hintergrund-Gauß (DoG-Bandpass)
-#SIGMA_SKALEN       = [1.0, 1.5, 3.0, 6.0]  # px Linien-Gauß je Skala (scharf … diffus)
-SIGMA_SKALEN       = [1.0,  8.0]  # px Linien-Gauß je Skala (scharf … diffus)
+SIGMA_SKALEN       = [1.0, 1.5, 3.0, 6.0]  # px Linien-Gauß je Skala (scharf … diffus)
 LAMBDA_FAKTOR      = 0.02             # relative Mindest-Ridge-Stärke
 PERCENTIL_FALLBACK = 60               # Otsu-Fallback, falls keine klare Trennung
 DILATION_RADIUS    = 10               # px 2D-Dilation um den Otsu-Kern
