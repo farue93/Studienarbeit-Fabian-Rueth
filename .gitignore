@@ -1,0 +1,22 @@
+# ============================================================
+# Nur raw/, ein leeres output/ und laser_pipeline.py versionieren.
+# Strategie: erst alles ignorieren, dann gezielt freigeben.
+# ============================================================
+
+# 1) Standardmaessig ALLES im Wurzelverzeichnis ignorieren
+/*
+
+# 2) Diese Eintraege wieder freigeben
+!/raw/
+!/output/
+!/laser_pipeline.py
+!/README.md
+!/.gitignore
+
+# 3) In output/ nur den leeren Ordner behalten (keine Bilder/Daten)
+output/*
+!output/.gitkeep
+
+# 4) Python-Cache nie versionieren
+__pycache__/
+*.pyc
