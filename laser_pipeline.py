@@ -15,7 +15,7 @@ Herleitung/verworfene Ansätze in ENTWICKLUNGSWEG_LASERLINIE.md):
   Schritt 5  Stärke-gewichteter Querschnitts-Schwerpunkt + Spline je Teilstück
                                                       (die starken/roten Pixel bestimmen die Lage)
   Schritt 6  Hermite-Brücke zwischen Teilstücken + lineare Endverlängerung
-  Schritt 7  Ausgabe: 1px-Linie, Bogenlänge s, Normalen (Mess-Grundlage), ROI-Crop
+  Schritt 7  Ausgabe: 1px-Linie, Bogenlänge s, Normalen (Mess-Grundlage) als npz + Kontrollbild
 
 Die senkrechte Verschiebung dieser Linie (Eis vs. Referenz) über der Bogenlänge s
 ist die spätere Eisdicke; die Normalen geben die Messrichtung.
@@ -43,7 +43,8 @@ OUTPUT.mkdir(parents=True, exist_ok=True)   # Ausgabeordner anlegen, falls nicht
 
 # ── Detektion (Steger) ────────────────────────────────────────────────────
 SIGMA_B            = 15.0              # px Hintergrund-Gauß (DoG-Bandpass)
-SIGMA_SKALEN       = [1.0, 1.5, 3.0, 6.0]  # px Linien-Gauß je Skala (scharf … diffus)
+#SIGMA_SKALEN       = [1.0, 1.5, 3.0, 6.0]  # px Linien-Gauß je Skala (scharf … diffus)
+SIGMA_SKALEN       = [1.0,  8.0]  # px Linien-Gauß je Skala (scharf … diffus)
 LAMBDA_FAKTOR      = 0.02             # relative Mindest-Ridge-Stärke
 PERCENTIL_FALLBACK = 60               # Otsu-Fallback, falls keine klare Trennung
 DILATION_RADIUS    = 10               # px 2D-Dilation um den Otsu-Kern
@@ -61,7 +62,6 @@ VERLAENGERN_PX     = 200   # px lineare Verlängerung je Ende
 TANGENTEN_FIT      = 25    # px für die gemittelte Rand-/Endsteigung
 
 # ── Ausgabe ───────────────────────────────────────────────────────────────
-ROI_PADDING        = 80    # px Rand um die Linie für die ROI
 NORMALE_STEP       = 120   # px-Abstand der gezeichneten Normalen (0 = aus)
 NORMALE_LEN        = 30    # px Länge der gezeichneten Normalen
 
@@ -460,16 +460,12 @@ def main():
                     naechste += NORMALE_STEP            # nächste Markierung weiterschalten
         cv2.imwrite(str(OUTPUT / f"{tif.stem}_fit.png"), rgb)
 
-        # ROI-Crop (Bounding-Box der Linie + Rand) für die Folgeframes
-        x0 = max(0, int(voll[:,0].min()) - ROI_PADDING)  # linke ROI-Kante (geklippt)
-        x1 = min(W, int(voll[:,0].max()) + ROI_PADDING)  # rechte ROI-Kante
-        y0 = max(0, int(voll[:,1].min()) - ROI_PADDING)  # obere ROI-Kante
-        y1 = min(H, int(voll[:,1].max()) + ROI_PADDING)  # untere ROI-Kante
-        cv2.imwrite(str(OUTPUT / f"{tif.stem}_roi.png"), img[y0:y1, x0:x1])  # ROI-Ausschnitt speichern
-
+        # Hinweis: Die eigentliche Mess-ROI (gerundetes adaptives Band) liefert
+        # crop_roi.py aus dem _laserlinie.npz; hier wird bewusst kein ROI-Bild
+        # mehr gespeichert.
         print(f"  {len(segs)} Teilstück(e)  Bogenlänge {L:.0f}px  "
-              f"Brücke {int(ist_br.sum())}px  ROI [{y0}:{y1}, {x0}:{x1}]  "
-              f"-> _fit.png + _roi.png + _laserlinie.npz  "
+              f"Brücke {int(ist_br.sum())}px  "
+              f"-> _fit.png + _laserlinie.npz  "
               f"[{time.perf_counter()-t0:.1f}s]")
 
         del img, img_f, maske, staerke, rgb            # große Arrays freigeben
